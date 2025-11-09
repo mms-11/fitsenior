@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,22 +12,58 @@ import { GraduationCap, MapPin, Calendar, DollarSign, Users, FileText } from "lu
 
 const CreateClass = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [loading, setLoading] = useState(false);
+  const [professionalId, setProfessionalId] = useState<string | null>(null);
+  
+  const demandData = location.state as {
+    demandId?: string;
+    activity?: string;
+    schedule?: string;
+    location?: string;
+  } | null;
+
   const [formData, setFormData] = useState({
-    title: "",
+    title: demandData?.activity || "",
     description: "",
     category: "",
-    location: "",
-    schedule: "",
+    location: demandData?.location || "",
+    schedule: demandData?.schedule || "",
     maxStudents: "",
     price: "",
     level: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate("/auth");
+        return;
+      }
+
+      const { data: prof } = await supabase
+        .from("professionals")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!prof) {
+        navigate("/cadastro-profissional");
+        return;
+      }
+
+      setProfessionalId(prof.id);
+    };
+
+    checkAuth();
+  }, [navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validação básica
-    if (!formData.title || !formData.category || !formData.location || !formData.schedule) {
+    if (!formData.title || !formData.category || !formData.location || !formData.schedule || !professionalId) {
       toast({
         title: "Erro",
         description: "Por favor, preencha todos os campos obrigatórios.",
@@ -34,23 +72,39 @@ const CreateClass = () => {
       return;
     }
 
-    // Em produção, aqui seria feita a requisição para salvar no banco
-    toast({
-      title: "Aula Cadastrada!",
-      description: "Sua aula foi criada com sucesso e já está visível para os alunos.",
-    });
+    setLoading(true);
 
-    // Limpar formulário
-    setFormData({
-      title: "",
-      description: "",
-      category: "",
-      location: "",
-      schedule: "",
-      maxStudents: "",
-      price: "",
-      level: "",
-    });
+    try {
+      const { error } = await supabase
+        .from("classes")
+        .insert({
+          professional_id: professionalId,
+          activity: formData.title,
+          description: formData.description,
+          schedule: formData.schedule,
+          max_students: parseInt(formData.maxStudents) || 10,
+          location: formData.location,
+          price: parseFloat(formData.price) || 0,
+          demand_id: demandData?.demandId || null,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Turma Cadastrada!",
+        description: "Sua turma foi criada com sucesso.",
+      });
+
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast({
+        title: "Erro ao cadastrar turma",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (field: string, value: string) => {
@@ -227,8 +281,8 @@ const CreateClass = () => {
                   </div>
 
                   {/* Submit Button */}
-                  <Button type="submit" size="lg" className="w-full text-lg">
-                    Cadastrar Aula
+                  <Button type="submit" size="lg" className="w-full text-lg" disabled={loading}>
+                    {loading ? "Cadastrando..." : "Cadastrar Turma"}
                   </Button>
                 </form>
               </CardContent>

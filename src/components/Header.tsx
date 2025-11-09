@@ -1,16 +1,38 @@
 import { Button } from "@/components/ui/button";
 import { Heart, Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const location = useLocation();
+
+  useEffect(() => {
+    // Verifica sessão inicial
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Escuta mudanças de autenticação
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const navItems = [
     { path: "/", label: "Início" },
     { path: "/buscar-aulas", label: "Buscar Aulas" },
     { path: "/cadastrar-aulas", label: "Para Profissionais" },
+    {
+      path: user ? "/dashboard" : "/auth",
+      label: user ? "Dashboard" : "Login",
+    },
   ];
 
   const isActive = (path: string) => location.pathname === path;
