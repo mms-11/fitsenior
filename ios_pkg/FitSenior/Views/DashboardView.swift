@@ -117,7 +117,7 @@ struct DashboardView: View {
             } else {
                 ForEach(classes) { classItem in
                     NavigationLink(destination: ClassManagementView(classId: classItem.id)) {
-                        ClassCard(classItem: classItem)
+                        DashboardClassCard(classItem: classItem)
                     }
                 }
                 .padding(.horizontal)
@@ -196,7 +196,7 @@ struct StatCard: View {
     }
 }
 
-struct ClassCard: View {
+struct DashboardClassCard: View {
     let classItem: Class
     
     var body: some View {
@@ -213,6 +213,7 @@ struct ClassCard: View {
                 
                 HStack {
                     Image(systemName: "clock")
+                        .foregroundColor(.teal)
                     Text(classItem.schedule)
                 }
                 .font(.subheadline)
@@ -220,6 +221,7 @@ struct ClassCard: View {
                 
                 HStack {
                     Image(systemName: "mappin")
+                        .foregroundColor(.teal)
                     Text(classItem.location)
                 }
                 .font(.subheadline)
@@ -227,8 +229,9 @@ struct ClassCard: View {
                 
                 HStack {
                     Image(systemName: "dollarsign.circle")
+                        .foregroundColor(.teal)
                     if let price = classItem.price {
-                        Text("R$ \(price, specifier: "%.2f")/mês por aluno")
+                        Text("R$ \(Int(price))/mês por aluno")
                     }
                 }
                 .font(.subheadline)

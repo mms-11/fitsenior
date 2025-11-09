@@ -18,7 +18,7 @@ struct PrimaryButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .background(Color.blue)
+            .background(Color.teal)
             .foregroundColor(.white)
             .cornerRadius(10)
         }
@@ -55,9 +55,9 @@ struct OutlineButton: View {
                 .padding()
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.blue, lineWidth: 1)
+                        .stroke(Color.teal, lineWidth: 1)
                 )
-                .foregroundColor(.blue)
+                .foregroundColor(.teal)
         }
     }
 }

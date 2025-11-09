@@ -12,6 +12,15 @@ struct Class: Codable, Identifiable {
     let demandId: String?
     let createdAt: Date?
     
+    // Novos campos para corresponder ao frontend
+    let imageUrl: String?
+    let category: String?
+    let level: String?
+    let rating: Double?
+    let instructor: String?
+    let city: String?
+    let neighborhood: String?
+    
     enum CodingKeys: String, CodingKey {
         case id
         case professionalId = "professional_id"
@@ -23,6 +32,13 @@ struct Class: Codable, Identifiable {
         case price
         case demandId = "demand_id"
         case createdAt = "created_at"
+        case imageUrl = "image_url"
+        case category
+        case level
+        case rating
+        case instructor
+        case city
+        case neighborhood
     }
 }
 

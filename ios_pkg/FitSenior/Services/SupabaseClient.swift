@@ -151,8 +151,32 @@ class SupabaseClient {
         }
         
         guard httpResponse.statusCode == 200 else {
-            let errorMessage = String(data: data, encoding: .utf8) ?? "Erro de autenticação"
-            throw NSError(domain: "SupabaseAuth", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+            // Tentar extrair mensagem de erro mais detalhada
+            var errorMessage = "Erro de autenticação"
+            var errorCode: String? = nil
+            
+            if let errorData = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                if let errorDesc = errorData["error_description"] as? String {
+                    errorMessage = errorDesc
+                } else if let errorMsg = errorData["message"] as? String {
+                    errorMessage = errorMsg
+                }
+                
+                if let code = errorData["error_code"] as? String {
+                    errorCode = code
+                } else if let code = errorData["error"] as? String {
+                    errorCode = code
+                }
+            } else if let errorString = String(data: data, encoding: .utf8) {
+                errorMessage = errorString
+            }
+            
+            var userInfo: [String: Any] = [NSLocalizedDescriptionKey: errorMessage]
+            if let code = errorCode {
+                userInfo["error_code"] = code
+            }
+            
+            throw NSError(domain: "SupabaseAuth", code: httpResponse.statusCode, userInfo: userInfo)
         }
         
         let session = try JSONDecoder().decode(SupabaseSession.self, from: data)
@@ -184,15 +208,39 @@ class SupabaseClient {
             throw NSError(domain: "SupabaseAuth", code: -1, userInfo: [NSLocalizedDescriptionKey: "Resposta inválida do servidor"])
         }
         
+        // Tentar decodificar a resposta
+        let authResponse: SupabaseAuthResponse
+        do {
+            authResponse = try JSONDecoder().decode(SupabaseAuthResponse.self, from: data)
+        } catch {
+            // Se não conseguir decodificar e o status não é 200, lançar erro
+            guard httpResponse.statusCode == 200 else {
+                let errorMessage = String(data: data, encoding: .utf8) ?? "Erro ao criar conta"
+                throw NSError(domain: "SupabaseAuth", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+            }
+            throw error
+        }
+        
+        // Supabase pode retornar 200 mesmo sem sessão se email confirmation estiver ativado
+        // Nesse caso, o usuário foi criado mas precisa confirmar o email
+        // Retornamos um erro especial que pode ser tratado pelo AuthService
+        guard let session = authResponse.session else {
+            // Se o status code é 200 mas não há sessão, o usuário foi criado mas precisa confirmar email
+            if httpResponse.statusCode == 200 {
+                // Lançamos um erro especial que será tratado pelo AuthService
+                throw NSError(domain: "SupabaseAuth", code: 202, userInfo: [
+                    NSLocalizedDescriptionKey: "Usuário criado, mas email precisa ser confirmado. Tentando fazer login automaticamente...",
+                    "userCreated": true
+                ])
+            } else {
+                let errorMessage = String(data: data, encoding: .utf8) ?? "Erro ao criar conta"
+                throw NSError(domain: "SupabaseAuth", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+            }
+        }
+        
         guard httpResponse.statusCode == 200 else {
             let errorMessage = String(data: data, encoding: .utf8) ?? "Erro ao criar conta"
             throw NSError(domain: "SupabaseAuth", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
-        }
-        
-        let authResponse = try JSONDecoder().decode(SupabaseAuthResponse.self, from: data)
-        
-        guard let session = authResponse.session else {
-            throw NSError(domain: "SupabaseAuth", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sessão não retornada"])
         }
         
         // Salvar tokens

@@ -2,8 +2,8 @@ import SwiftUI
 
 struct AuthView: View {
     @StateObject private var authService = AuthService.shared
-    @State private var email = ""
-    @State private var password = ""
+    @State private var email = "dev@fitsenior.com"
+    @State private var password = "123456"
     @State private var isSignUp = false
     @State private var showingError = false
     
@@ -77,7 +77,9 @@ struct AuthView: View {
                                                     try await authService.signIn(email: email, password: password)
                                                 }
                                             } catch {
-                                                showingError = true
+                                                await MainActor.run {
+                                                    showingError = true
+                                                }
                                             }
                                         }
                                     },
@@ -85,6 +87,17 @@ struct AuthView: View {
                                 )
                                 .padding(.horizontal)
                                 .padding(.bottom)
+                                
+                                // Error message display (apenas erros que não são sobre confirmação de email)
+                                if let errorMessage = authService.errorMessage, 
+                                   !errorMessage.isEmpty,
+                                   !errorMessage.contains("confirmado") {
+                                    Text(errorMessage)
+                                        .font(.caption)
+                                        .foregroundColor(.red)
+                                        .padding(.horizontal)
+                                        .multilineTextAlignment(.center)
+                                }
                             }
                         }
                         .padding(.horizontal)

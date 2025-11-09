@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		33ABBFAC2EC1302500C317C1 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33ABBFAB2EC1302500C317C1 /* LocationService.swift */; };
+		33ABBFAE2EC1303700C317C1 /* MockDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33ABBFAD2EC1303700C317C1 /* MockDataService.swift */; };
 		A1000001 /* FitSeniorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002 /* FitSeniorApp.swift */; };
 		A1000003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000004 /* ContentView.swift */; };
 		A1000005 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000006 /* Assets.xcassets */; };
@@ -36,6 +38,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		33ABBFAB2EC1302500C317C1 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		33ABBFAD2EC1303700C317C1 /* MockDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDataService.swift; sourceTree = "<group>"; };
 		A1000000 /* FitSenior.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitSenior.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000002 /* FitSeniorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitSeniorApp.swift; sourceTree = "<group>"; };
 		A1000004 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -146,6 +150,8 @@
 				A1000021 /* AuthService.swift */,
 				A1000023 /* DatabaseService.swift */,
 				A1000025 /* SupabaseClient.swift */,
+				33ABBFAB2EC1302500C317C1 /* LocationService.swift */,
+				33ABBFAD2EC1303700C317C1 /* MockDataService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -253,6 +259,7 @@
 				A1000024 /* SupabaseClient.swift in Sources */,
 				A1000026 /* AuthView.swift in Sources */,
 				A1000028 /* ClassManagementView.swift in Sources */,
+				33ABBFAC2EC1302500C317C1 /* LocationService.swift in Sources */,
 				A100002A /* CreateClassView.swift in Sources */,
 				A100002C /* DashboardView.swift in Sources */,
 				A100002E /* FinancialView.swift in Sources */,
@@ -264,6 +271,7 @@
 				A100003A /* InputView.swift in Sources */,
 				A100003C /* Attendance.swift in Sources */,
 				A100003E /* Class.swift in Sources */,
+				33ABBFAE2EC1303700C317C1 /* MockDataService.swift in Sources */,
 				A1000040 /* Demand.swift in Sources */,
 				A1000042 /* Enrollment.swift in Sources */,
 				A1000044 /* ForumMessage.swift in Sources */,
