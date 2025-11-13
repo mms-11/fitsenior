@@ -13,57 +13,35 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/context/auth";
 
 const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, role, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const checkUserAndRedirect = async (session: any) => {
-      if (!session) return;
-
-      const { data } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", session.user.id)
-        .maybeSingle();
-
-      if (!data?.role) {
+    // Se já está autenticado, redireciona
+    if (!authLoading && user) {
+      if (!role) {
         // Usuário ainda não tem role, redireciona para escolha
         navigate("/");
         return;
       }
 
       // Redireciona baseado no role
-      if (data.role === "professional") {
+      if (role === "professional") {
         navigate("/dashboard");
-      } else if (data.role === "student") {
+      } else if (role === "student") {
         navigate("/minhas-turmas");
       } else {
         navigate("/");
       }
-    };
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        checkUserAndRedirect(session);
-      }
-    });
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        checkUserAndRedirect(session);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    }
+  }, [user, role, authLoading, navigate]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();

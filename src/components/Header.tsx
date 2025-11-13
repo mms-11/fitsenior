@@ -1,81 +1,37 @@
 import { Button } from "@/components/ui/button";
 import { Heart, Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useAuth } from "@/context/auth";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isAuth, setIsAuth] = useState(false);
-  const [role, setRole] = useState(null);
+  const { user, role } = useAuth();
   const location = useLocation();
-
-  const fetchUserRole = async (userId: string) => {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .single();
-
-    return data?.role ?? null;
-  };
-
-  useEffect(() => {
-    // Verifica sessão inicial
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        const role = await fetchUserRole(session.user.id);
-        setRole(role);
-        setIsAuth(true);
-      }
-    });
-
-    // Escuta mudanças de autenticação
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        const role = await fetchUserRole(session.user.id);
-        setRole(role);
-        setIsAuth(true);
-      } else {
-        setRole(null);
-        setIsAuth(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const navItemsUnauth = [
     { path: "/", label: "Início" },
-    {
-      path: "/auth",
-      label: "Login",
-    },
+    { path: "/auth", label: "Login" },
   ];
 
   const navItemsStudents = [{ path: "/buscar-aulas", label: "Buscar Aulas" }];
+
   const navItemsProfessionals = [
     { path: "/cadastrar-aulas", label: "Cadastrar aula" },
-    {
-      path: "/dashboard",
-      label: "Dashboard",
-    },
+    { path: "/dashboard", label: "Dashboard" },
   ];
 
   const navRole = role === "student" ? navItemsStudents : navItemsProfessionals;
-
-  const navItems = isAuth ? navRole : navItemsUnauth;
+  const navItems = user ? navRole : navItemsUnauth;
 
   const isActive = (path: string) => location.pathname === path;
 
   const homePath = useMemo(() => {
-    if (!isAuth) return "/";
+    if (!user) return "/";
     if (role === "professional") return "/dashboard";
     if (role === "student") return "/minhas-turmas";
     return "/";
-  }, [isAuth, role]);
+  }, [user, role]);
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b shadow-soft">
