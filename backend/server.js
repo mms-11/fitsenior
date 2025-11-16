@@ -13,8 +13,27 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+// CORS configurado para produção e desenvolvimento
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://seu-app.vercel.app', 'https://fitsenior.vercel.app'] // adicione sua URL da Vercel aqui
+    : '*',
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'FitSenior API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      api: '/api'
+    }
+  });
+});
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', uptime: process.uptime() });
