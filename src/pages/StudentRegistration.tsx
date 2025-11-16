@@ -123,7 +123,6 @@ const StudentRegistration = () => {
         }
       }
 
-      // Mudei de .insert() para .upsert()
       const { error: studentError } = await supabase
         .from("students")
         .upsert(
@@ -142,13 +141,6 @@ const StudentRegistration = () => {
         );
 
       if (studentError) throw studentError;
-
-      const { error: roleError } = await supabase.from("user_roles").insert({
-        user_id: user.id,
-        role: "student",
-      });
-
-      if (roleError) throw roleError;
 
       toast({
         title: "Cadastro concluído!",
