@@ -319,67 +319,46 @@ export type Database = {
       };
       students: {
         Row: {
-          address: string;
-          avatar_url: string | null;
-          birth_date: string;
-          cpf: string;
-          created_at: string | null;
-          email: string;
+          id: string;
+          user_id: string;
           full_name: string;
           gender: string;
-          health_certificate_url: string | null;
-          id: string;
           phone: string;
-          user_id: string;
+          email: string;
+          cpf: string;
+          address: string;
+          birth_date: string;
+          health_certificate_url: string | null;
+          avatar_url: string | null;
+          created_at: string | null;
         };
         Insert: {
-          address: string;
-          avatar_url?: string | null;
-          birth_date: string;
-          cpf: string;
-          created_at?: string | null;
-          email: string;
+          id?: string;
+          user_id: string;
           full_name: string;
           gender: string;
-          health_certificate_url?: string | null;
-          id?: string;
           phone: string;
-          user_id: string;
+          email: string;
+          cpf: string;
+          address: string;
+          birth_date: string;
+          health_certificate_url?: string | null;
+          avatar_url?: string | null;
+          created_at?: string | null;
         };
         Update: {
-          address?: string;
-          avatar_url?: string | null;
-          birth_date?: string;
-          cpf?: string;
-          created_at?: string | null;
-          email?: string;
+          id?: string;
+          user_id?: string;
           full_name?: string;
           gender?: string;
-          health_certificate_url?: string | null;
-          id?: string;
           phone?: string;
-          user_id?: string;
-        };
-        Relationships: [];
-      };
-      user_roles: {
-        Row: {
-          created_at: string | null;
-          id: string;
-          role: Database["public"]["Enums"]["app_role"];
-          user_id: string;
-        };
-        Insert: {
+          email?: string;
+          cpf?: string;
+          address?: string;
+          birth_date?: string;
+          health_certificate_url?: string | null;
+          avatar_url?: string | null;
           created_at?: string | null;
-          id?: string;
-          role: Database["public"]["Enums"]["app_role"];
-          user_id: string;
-        };
-        Update: {
-          created_at?: string | null;
-          id?: string;
-          role?: Database["public"]["Enums"]["app_role"];
-          user_id?: string;
         };
         Relationships: [];
       };
@@ -388,16 +367,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"];
-          _user_id: string;
-        };
-        Returns: boolean;
-      };
+      [_ in never]: never;
     };
     Enums: {
-      app_role: "professional" | "student" | "admin";
+      [_ in never]: never;
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -421,7 +394,7 @@ export type Tables<
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never
+    : never
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals;
 }
@@ -524,11 +497,3 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
   ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
   : never;
-
-export const Constants = {
-  public: {
-    Enums: {
-      app_role: ["professional", "student", "admin"],
-    },
-  },
-} as const;
