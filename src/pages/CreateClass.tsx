@@ -103,18 +103,15 @@ const CreateClass = () => {
     setLoading(true);
 
     try {
-     
       const { error } = await supabase.from("classes").insert({
-        professional_id: professionalId, //  Campo correto
-        title: formData.title,
+        professional_id: professionalId,
+        activity: formData.title,
         description: formData.description,
-        date: new Date().toISOString(), //  Data atual
-        capacity: parseInt(formData.maxStudents) || 10,
+        schedule: formData.schedule,
+        max_students: parseInt(formData.maxStudents) || 10,
         location: formData.location,
-        category: formData.category,
-        level: formData.level as "beginner" | "intermediate" | "advanced",
-        activity: formData.title, // Campo obrigatório
-        schedule: formData.schedule, //  Campo obrigatório
+        price: parseFloat(formData.price) || 0,
+        demand_id: demandData?.demandId || null,
       });
 
       if (error) throw error;

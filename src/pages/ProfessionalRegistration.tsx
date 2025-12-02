@@ -36,44 +36,24 @@ const ProfessionalRegistration = () => {
 
   useEffect(() => {
     const checkUser = async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        navigate("/auth");
+        return;
+      }
+      setUserId(user.id);
 
-        if (!user) {
-          navigate("/auth");
-          return;
-        }
+      // Check if professional profile already exists
+      const { data: professional } = await supabase
+        .from("professionals")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
 
-        setUserId(user.id);
-
-        // Check if professional profile already exists
-        const { data: professional, error } = await supabase
-          .from("professionals")
-          .select("*")
-          .eq("user_id", user.id)
-          .maybeSingle();
-
-        if (error) {
-          console.error("Erro ao verificar profissional:", error);
-        }
-
-        if (professional) {
-          toast({
-            title: "Perfil já existe",
-            description:
-              "Você já completou seu cadastro profissional. Redirecionando para o perfil...",
-          });
-          // ✅ Mudança aqui: redireciona para /profile
-          navigate("/profile");
-          return;
-        }
-
-        setChecking(false);
-      } catch (error) {
-        console.error("Erro na verificação:", error);
-        setChecking(false);
+      if (professional) {
+        navigate("/dashboard");
       }
     };
 
@@ -87,19 +67,15 @@ const ProfessionalRegistration = () => {
     setLoading(true);
 
     try {
-      const { error: profError } = await supabase
-        .from("professionals")
-        .upsert(
-          {
-            user_id: userId,
-            cref: formData.cref,
-            full_name: formData.fullName,
-            birth_date: formData.birthDate,
-            specialty: formData.specialty,
-            cpf: formData.cpf,
-          },
-          { onConflict: "user_id" }
-        );
+      // Insert professional data
+      const { error: profError } = await supabase.from("professionals").insert({
+        user_id: userId,
+        cref: formData.cref,
+        full_name: formData.fullName,
+        birth_date: formData.birthDate,
+        specialty: formData.specialty,
+        cpf: formData.cpf,
+      });
 
       if (profError) throw profError;
 

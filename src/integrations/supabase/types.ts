@@ -267,24 +267,21 @@ export type Database = {
         Row: {
           created_at: string;
           id: string;
-          content: string; // ✅ Mudou de 'message' para 'content'
-          read: boolean; // ✅ Já existe no schema
+          message: string;
           recipient_id: string;
           sender_id: string;
         };
         Insert: {
           created_at?: string;
           id?: string;
-          content: string; // ✅ Mudou de 'message' para 'content'
-          read?: boolean;
+          message: string;
           recipient_id: string;
           sender_id: string;
         };
         Update: {
           created_at?: string;
           id?: string;
-          content?: string; // ✅ Mudou de 'message' para 'content'
-          read?: boolean;
+          message?: string;
           recipient_id?: string;
           sender_id?: string;
         };

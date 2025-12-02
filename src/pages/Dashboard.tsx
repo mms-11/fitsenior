@@ -107,7 +107,7 @@ const Dashboard = () => {
 
   const totalRevenue = classes.reduce((sum, cls) => {
     const students = cls.enrollments[0]?.count || 0;
-    return sum + students * (cls.max_students ? cls.capacity : 0); // ou adapte ao campo correto
+    return sum + cls.price * students;
   }, 0);
 
   const totalStudents = classes.reduce((sum, cls) => {
